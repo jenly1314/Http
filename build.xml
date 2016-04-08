@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project default="proguard" name="bgt-total">
+
+	<!-- 当前sdk版本 -->
+	<property name="version" value="1.4.9" />
+	<property name="rootDir" value="./" />
+	<property name="classDir" value="${rootDir}/bin/classes" />
+	<property name="libDir" value="${rootDir}/libs" />
+	<property name="proguardDir" value="${rootDir}/proguard" />
+	<property name="outputDir" value="${rootDir}/output" />
+	<property name="android_sdk" value="D:/Android/adt-bundle-windows-x86_64-20140321/sdk" />
+
+	<!-- 混淆包及android编译包所在路径。混淆打包时需要修改为实际的混淆包所在路径  -->
+	<property name="proguard.jar" value="${android_sdk}/tools/proguard/lib/proguard.jar" />
+	<property name="android.jar" value="${android_sdk}/platforms/android-17/android.jar" />
+
+	<property name="destJarOnline" value="hallostar_sdk_${version}.jar" />
+
+	<property name="tempJarOnline" value="http_online.jar" />
+
+
+	<target name="init">
+		<mkdir dir="${outputDir}" />
+		<delete file="${outputDir}/${destJarOnline}" />
+		<delete file="${outputDir}/${tempJarOnline}" />
+	</target>
+
+	<!-- 打包 -->
+	<target name="package-jar" depends="init">
+
+		<!-- 打成online jar包 -->
+		<echo message=" start to export ${tempJarOnline}" />
+		<jar destfile="${outputDir}/${tempJarOnline}">
+			<fileset dir="${classDir}/">
+			</fileset>
+		</jar>
+
+	</target>
+	
+	<!-- 混淆jar 
+	-->
+	<target name="proguard" depends="package-jar">
+		<taskdef resource="proguard/ant/task.properties" classpath="${proguard.jar}" />
+
+		<!-- 混淆提供给集成方的jar <libraryjar dir="${libDir}" /> -->
+		<echo message=" start to proguard ${tempJarOnline}" />
+		<proguard configuration="${rootDir}/proguard-project.txt" >
+			<injar file="${outputDir}/${tempJarOnline}" />
+			<outjar file="${outputDir}/${destJarOnline}" />
+			<libraryjar file="${android.jar}" />
+			<libraryjar dir="${libDir}"/>
+		</proguard>
+
+	</target>
+
+
+</project>
